@@ -15,7 +15,7 @@ export const metadata = {
   title: "IAGI Election Portal",
   description: "Indian Academy Election Portal",
   icons: {
-    icon: "/favicon.png",
+    icon: "/favicon.png?v=2",
   },
 };
 
