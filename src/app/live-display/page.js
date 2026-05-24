@@ -207,17 +207,21 @@ export default function LiveDisplayPage() {
                 <h3
                   className={`text-4xl font-bold mt-3 ${
                     electionStatus === "open"
-                      ? "text-green-400"
-                      : electionStatus === "closed"
-                      ? "text-red-400"
-                      : "text-yellow-400"
+  ? "text-green-400"
+  : electionStatus === "closed"
+  ? "text-red-400"
+  : electionStatus === "declared"
+  ? "text-blue-400"
+  : "text-yellow-400"
                   }`}
                 >
                   {electionStatus === "open"
-                    ? "OPEN"
-                    : electionStatus === "closed"
-                    ? "CLOSED"
-                    : "NOT STARTED"}
+  ? "OPEN"
+  : electionStatus === "closed"
+  ? "CLOSED"
+  : electionStatus === "declared"
+  ? "RESULT DECLARED"
+  : "NOT STARTED"}
                 </h3>
               </div>
             </div>
