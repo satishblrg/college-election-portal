@@ -150,28 +150,28 @@ const declareResult = async () => {
 
   <button
   onClick={markNotStarted}
-  className="bg-yellow-600 px-6 py-3 rounded-2xl font-bold text-white"
+  className="min-w-[180px] h-[70px] flex items-center justify-center text-center bg-yellow-600 rounded-2xl font-bold text-white text-2xl"
 >
   Not Started
 </button>
 
   <button
     onClick={openElection}
-    className="bg-green-600 px-6 py-3 rounded-2xl font-bold text-white"
+    className="min-w-[180px] h-[70px] flex items-center justify-center text-center bg-green-600 rounded-2xl font-bold text-white text-2xl"
   >
     Open
   </button>
 
   <button
     onClick={closeElection}
-    className="bg-red-600 px-6 py-3 rounded-2xl font-bold text-white"
+    className="min-w-[180px] h-[70px] flex items-center justify-center text-center bg-red-600 rounded-2xl font-bold text-white text-2xl"
   >
     Close
   </button>
 
   <button
   onClick={declareResult}
-  className="bg-blue-600 px-6 py-3 rounded-2xl font-bold text-white"
+  className="min-w-[180px] h-[70px] flex items-center justify-center text-center bg-blue-600 rounded-2xl font-bold text-white text-2xl"
 >
   Declare Result
 </button>
@@ -181,7 +181,7 @@ const declareResult = async () => {
       localStorage.removeItem("adminLoggedIn");
       router.push("/admin-login");
     }}
-    className="bg-gradient-to-r from-red-500 to-purple-600 px-6 py-3 rounded-2xl font-bold"
+    className="min-w-[180px] h-[70px] flex items-center justify-center text-center bg-gradient-to-r from-pink-500 to-purple-600 rounded-2xl font-bold text-white text-2xl"
   >
     Logout
   </button>
