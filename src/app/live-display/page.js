@@ -12,6 +12,7 @@ export default function LiveDisplayPage() {
   const [activeCandidateIndex, setActiveCandidateIndex] = useState(0);
   const [isFading, setIsFading] = useState(false);
 
+
   const totalVoters = 1000;
 
   const candidates = [
@@ -260,7 +261,7 @@ export default function LiveDisplayPage() {
             </div>
 
             <p className="text-gray-500 mt-8 text-lg">
-              Candidate profiles rotate automatically
+              Profiles of Candidate 
             </p>
           </div>
         </div>
