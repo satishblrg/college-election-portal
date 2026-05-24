@@ -8,6 +8,7 @@ import { db } from "@/firebase/config";
 export default function VotePage() {
   const [studentData, setStudentData] = useState(null);
   const [votes, setVotes] = useState({});
+  const [electionStatus, setElectionStatus] = useState("not-started");
   const router = useRouter();
 
  useEffect(() => {
@@ -25,15 +26,13 @@ export default function VotePage() {
     if (settingsSnapshot.exists()) {
       const electionStatus = settingsSnapshot.val();
 
-     if (electionStatus === "not-started") {
-  router.push("/not-started");
-  return;
-}
-
-if (electionStatus === "closed") {
+      setElectionStatus(electionStatus);
+      
+      if (electionStatus !== "open") {
   router.push("/election-closed");
   return;
 }
+
     }
 
     setStudentData(JSON.parse(data));
@@ -108,6 +107,10 @@ if (electionStatus === "closed") {
       router.push("/login");
       return;
     }
+    if (electionStatus !== "open") {
+  router.push("/election-closed");
+  return;
+}
     const totalRequiredSelections = positions.reduce(
   (total, position) => total + position.candidates.length,
   0

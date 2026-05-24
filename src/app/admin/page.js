@@ -108,6 +108,11 @@ const closeElection = async () => {
   setElectionStatus("closed");
 };
 
+const declareResult = async () => {
+  await set(ref(db, "settings/electionStatus"), "declared");
+  setElectionStatus("declared");
+};
+
   return (
     <div className="min-h-screen bg-black text-white p-10">
       <div className="flex items-center justify-between mb-10">
@@ -163,6 +168,13 @@ const closeElection = async () => {
   >
     Close
   </button>
+
+  <button
+  onClick={declareResult}
+  className="bg-blue-600 px-6 py-3 rounded-2xl font-bold text-white"
+>
+  Declare Result
+</button>
 
   <button
     onClick={() => {
