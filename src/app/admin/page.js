@@ -4,6 +4,9 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ref, get, set } from "firebase/database";
 import { db } from "@/firebase/config";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+
 
 export default function AdminPage() {
   const router = useRouter();
@@ -13,6 +16,55 @@ export default function AdminPage() {
   const [firstPreferenceCounts, setFirstPreferenceCounts] = useState({});
   const [facultyPreferenceCounts, setFacultyPreferenceCounts] = useState({});
   const [electionStatus, setElectionStatus] = useState("not-started");
+
+const exportVotesToExcel = async () => {
+  const votesRef = ref(db, "votes");
+  const snapshot = await get(votesRef);
+
+  if (!snapshot.exists()) {
+    alert("No votes found.");
+    return;
+  }
+
+  const votesData = snapshot.val();
+
+  const excelData = [];
+
+  Object.entries(votesData).forEach(([regNumber, data]) => {
+    const student = data.student || {};
+    const votes = data.votes || {};
+
+    Object.entries(votes).forEach(([position, rankings]) => {
+      Object.entries(rankings).forEach(([rank, candidate]) => {
+        excelData.push({
+          RegisterNumber: regNumber,
+          Name: student.name || "",
+          Email: student.email || "",
+          Position: position,
+          Rank: rank,
+          Candidate: candidate,
+          VotedAt: data.votedAt || "",
+        });
+      });
+    });
+  });
+
+  const worksheet = XLSX.utils.json_to_sheet(excelData);
+  const workbook = XLSX.utils.book_new();
+
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Votes");
+
+  const excelBuffer = XLSX.write(workbook, {
+    bookType: "xlsx",
+    type: "array",
+  });
+
+  const fileData = new Blob([excelBuffer], {
+    type: "application/octet-stream",
+  });
+
+  saveAs(fileData, "Election_Votes.xlsx");
+};
 
   useEffect(() => {
     const isAdminLoggedIn = localStorage.getItem("adminLoggedIn");
@@ -184,6 +236,13 @@ export default function AdminPage() {
           >
             Declare Result
           </button>
+
+          <button
+  onClick={exportVotesToExcel}
+  className="bg-emerald-600 px-8 py-4 rounded-2xl font-bold text-white text-xl"
+>
+  Export Excel
+</button>
 
           <button
             onClick={() => {
