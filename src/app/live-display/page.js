@@ -12,6 +12,10 @@ export default function LiveDisplayPage() {
   const [activeCandidateIndex, setActiveCandidateIndex] = useState(0);
   const [isFading, setIsFading] = useState(false);
 
+  const [winners, setWinners] = useState({});
+  const [activeWinnerIndex, setActiveWinnerIndex] = useState(0);
+  const [countdown, setCountdown] = useState(3);
+
 
   const totalVoters = 1000;
 
@@ -75,6 +79,23 @@ export default function LiveDisplayPage() {
       : 0;
 
   const activeCandidate = candidates[activeCandidateIndex];
+  const winnerEntries = Object.entries(winners);
+ const activeWinner =
+  winnerEntries.length > 0
+    ? winnerEntries[activeWinnerIndex % winnerEntries.length]
+    : null;
+const winnerImageMap = {
+  "Rahul": "/candidates/rahul.jpg",
+  "David": "/candidates/david.jpg",
+  "Arjun": "/candidates/arjun.jpg",
+  "Sneha": "/candidates/sneha.jpg",
+};
+
+const activeWinnerImage =
+  activeWinner?.[1]?.name &&
+  winnerImageMap[activeWinner[1].name]
+    ? winnerImageMap[activeWinner[1].name]
+    : "/candidates/rahul.jpg";
 
   useEffect(() => {
     const updateClock = () => {
@@ -107,7 +128,52 @@ export default function LiveDisplayPage() {
       const statusSnapshot = await get(statusRef);
 
       if (votesSnapshot.exists()) {
-        setVotesCast(Object.keys(votesSnapshot.val()).length);
+        const votesData = votesSnapshot.val();
+
+setVotesCast(Object.keys(votesData).length);
+
+const candidateVoteCounts = {};
+
+Object.values(votesData).forEach((voteRecord) => {
+  const votePositions = voteRecord.votes;
+
+  Object.entries(votePositions).forEach(([position, rankings]) => {
+    const firstPreferenceCandidate = rankings["1"];
+
+    if (!candidateVoteCounts[position]) {
+      candidateVoteCounts[position] = {};
+    }
+
+    if (!candidateVoteCounts[position][firstPreferenceCandidate]) {
+      candidateVoteCounts[position][firstPreferenceCandidate] = 0;
+    }
+
+    candidateVoteCounts[position][firstPreferenceCandidate] += 1;
+  });
+});
+
+const calculatedWinners = {};
+
+Object.entries(candidateVoteCounts).forEach(
+  ([position, candidates]) => {
+    let highestVotes = 0;
+    let winnerName = "";
+
+    Object.entries(candidates).forEach(([candidate, votes]) => {
+      if (votes > highestVotes) {
+        highestVotes = votes;
+        winnerName = candidate;
+      }
+    });
+
+    calculatedWinners[position] = {
+      name: winnerName,
+      votes: highestVotes,
+    };
+  }
+);
+
+setWinners(calculatedWinners);
       }
 
       if (facultySnapshot.exists()) {
@@ -141,6 +207,39 @@ export default function LiveDisplayPage() {
 
   return () => clearInterval(candidateTimer);
 }, [candidates.length]);
+useEffect(() => {
+  if (electionStatus !== "declared") {
+    setCountdown(3);
+    return;
+  }
+
+  const countdownTimer = setInterval(() => {
+    setCountdown((previousCount) => {
+      if (previousCount <= 1) {
+        clearInterval(countdownTimer);
+        return 0;
+      }
+
+      return previousCount - 1;
+    });
+  }, 1000);
+
+  return () => clearInterval(countdownTimer);
+}, [electionStatus]);
+
+useEffect(() => {
+  if (electionStatus !== "declared") return;
+
+  const winnerRotation = setInterval(() => {
+    setActiveWinnerIndex((previousIndex) =>
+      winnerEntries.length === 0
+        ? 0
+        : (previousIndex + 1) % winnerEntries.length
+    );
+  }, 5000);
+
+  return () => clearInterval(winnerRotation);
+}, [electionStatus, winnerEntries.length]);
 
   return (
     <div className="min-h-screen bg-black text-white overflow-hidden relative">
@@ -234,35 +333,88 @@ export default function LiveDisplayPage() {
               Candidate Spotlight
             </p>
 
-            <div
-  className={`bg-black/40 rounded-[2rem] p-8 border border-purple-700 transition-all duration-700 ${
-    isFading
-      ? "opacity-0 translate-x-10 scale-95"
-      : "opacity-100 translate-x-0 scale-100"
-  }`}
->
-              <img
-                src={activeCandidate.image}
-                alt={activeCandidate.name}
-                className="w-72 h-72 mx-auto rounded-[2rem] object-cover border-4 border-pink-500 shadow-[0_0_60px_rgba(236,72,153,0.45)]"
-              />
+            {
+  electionStatus === "declared" ? (
+    <div className="relative bg-black/40 rounded-[2rem] p-8 border border-yellow-500 shadow-[0_0_60px_rgba(255,215,0,0.45)] overflow-hidden">
+      {countdown === 0 && (
+  <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-[2rem]">
+    <div className="absolute left-[10%] top-[-10%] text-4xl animate-bounce">🎉</div>
+    <div className="absolute left-[30%] top-[-5%] text-4xl animate-ping">✨</div>
+    <div className="absolute left-[55%] top-[-8%] text-4xl animate-bounce">🎊</div>
+    <div className="absolute left-[75%] top-[-6%] text-4xl animate-ping">✨</div>
+  </div>
+)}
 
-              <h2 className="text-5xl font-extrabold mt-8 text-white">
-                {activeCandidate.name}
-              </h2>
+     {
+  countdown > 0 ? (
+    <div className="text-[10rem] font-extrabold text-yellow-400 animate-pulse">
+      {countdown}
+    </div>
+  ) : (
+    <div className="text-6xl mb-6 animate-bounce">
+      🏆
+    </div>
+  )
+}
+<img
+ src={activeWinnerImage}
+  alt="Winner"
+  className="w-72 h-72 mx-auto rounded-[2rem] object-cover border-4 border-yellow-400 shadow-[0_0_80px_rgba(255,215,0,0.6)] animate-[pulse_2s_infinite]"
+/>
 
-              <p className="text-3xl text-pink-400 font-bold mt-4">
-                {activeCandidate.position}
-              </p>
+      <h2 className="text-5xl font-extrabold text-yellow-400">
+        WINNER
+      </h2>
 
-              <p className="text-2xl text-gray-300 mt-4">
-                {activeCandidate.department}
-              </p>
+      <p className="text-2xl text-white mt-4">
+        {activeWinner?.[1]?.name || "Calculating..."}
+      </p>
 
-              <p className="text-2xl text-cyan-300 italic mt-6">
-                "{activeCandidate.slogan}"
-              </p>
-            </div>
+      <p className="text-xl text-pink-400 mt-3">
+        {activeWinner?.[0] || ""}
+      </p>
+
+      <p className="text-2xl text-green-400 font-bold mt-6">
+        {activeWinner?.[1]?.votes || 0} Votes
+      </p>
+
+    </div>
+  ) : (
+
+    <div
+      className={`bg-black/40 rounded-[2rem] p-8 border border-purple-700 transition-all duration-700 ${
+        isFading
+          ? "opacity-0 translate-x-10 scale-95"
+          : "opacity-100 translate-x-0 scale-100"
+      }`}
+    >
+
+      <img
+        src={activeCandidate.image}
+        alt={activeCandidate.name}
+        className="w-72 h-72 mx-auto rounded-[2rem] object-cover border-4 border-pink-500 shadow-[0_0_60px_rgba(236,72,153,0.45)]"
+      />
+
+      <h2 className="text-5xl font-extrabold mt-8 text-white">
+        {activeCandidate.name}
+      </h2>
+
+      <p className="text-3xl text-pink-400 font-bold mt-4">
+        {activeCandidate.position}
+      </p>
+
+      <p className="text-2xl text-gray-300 mt-4">
+        {activeCandidate.department}
+      </p>
+
+      <p className="text-2xl text-cyan-300 italic mt-6">
+        "{activeCandidate.slogan}"
+      </p>
+
+    </div>
+
+  )
+}
 
             <p className="text-gray-500 mt-8 text-lg">
               Profiles of Candidate 

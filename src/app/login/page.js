@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { ref, get } from "firebase/database";
+import { db } from "@/firebase/config";
 
 export default function LoginPage() {
     const [rollNumber, setRollNumber] = useState("");
@@ -80,7 +82,7 @@ const router = useRouter();
             />
 
             <button
-  onClick={() => {
+  onClick={async () => {
     if (!rollNumber) {
       alert("Please enter your Roll Number");
       return;
@@ -105,6 +107,21 @@ const router = useRouter();
      router.push("/access-denied");
       return;
     }
+
+    const voterRef = ref(db, "voters/" + rollNumber.trim().toUpperCase());
+const voterSnapshot = await get(voterRef);
+
+if (!voterSnapshot.exists()) {
+  alert("You are not listed in the official voter database.");
+  return;
+}
+
+const voterData = voterSnapshot.val();
+
+if (voterData.email && voterData.email.toLowerCase() !== email.toLowerCase()) {
+  alert("Register Number and Email ID do not match.");
+  return;
+}
 
    localStorage.setItem(
   "studentData",

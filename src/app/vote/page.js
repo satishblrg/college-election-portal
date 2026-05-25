@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ref, set, get } from "firebase/database";
+import { ref, set, get, update } from "firebase/database";
 import { db } from "@/firebase/config";
 
 export default function VotePage() {
@@ -107,6 +107,19 @@ export default function VotePage() {
       router.push("/login");
       return;
     }
+const voterRef = ref(db, "voters/" + studentData.rollNumber);
+const voterSnapshot = await get(voterRef);
+
+if (voterSnapshot.exists()) {
+  const voterData = voterSnapshot.val();
+
+  if (voterData.hasVoted === true) {
+    alert("You have already voted.");
+    router.push("/login");
+    return;
+  }
+}
+
     if (electionStatus !== "open") {
   router.push("/election-closed");
   return;
@@ -149,6 +162,10 @@ const voteData = {
 };
 
     await set(voteRef, voteData);
+    
+    await update(ref(db, "voters/" + studentData.rollNumber), {
+  hasVoted: true,
+});
 
     router.push("/thank-you");
   };
