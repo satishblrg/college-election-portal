@@ -1,9 +1,11 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function ElectionClosedPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const type = searchParams.get("type");
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center px-6">
@@ -28,7 +30,9 @@ export default function ElectionClosedPage() {
 
         <div className="mt-10">
           <button
-            onClick={() => router.push("/login")}
+            onClick={() =>
+            router.push(type === "faculty" ? "/faculty-login" : "/login")
+}
             className="bg-gradient-to-r from-red-500 to-purple-600 px-10 py-4 rounded-2xl text-xl font-bold text-white hover:scale-105 transition"
           >
             Back to Login

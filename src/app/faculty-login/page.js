@@ -22,10 +22,20 @@ export default function FacultyLoginPage() {
         return;
       }
 
-      if (!email.endsWith("@indianacademy.edu.in")) {
-        alert("Please use your official Indian Academy email ID.");
-        return;
-      }
+      const allowedDomains = [
+  "@iadc.ac.in",
+  "@iasms.edu.in",
+  "@indianacademy.edu.in"
+];
+
+const emailValid = allowedDomains.some((domain) =>
+  email.toLowerCase().endsWith(domain)
+);
+
+if (!emailValid) {
+  alert("Please use your official Indian Academy email ID.");
+  return;
+}
     }
 
     localStorage.setItem(

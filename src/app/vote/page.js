@@ -29,7 +29,7 @@ export default function VotePage() {
       setElectionStatus(electionStatus);
       
       if (electionStatus !== "open") {
-  router.push("/election-closed");
+  router.push("/election-closed?type=student");
   return;
 }
 
@@ -121,7 +121,7 @@ if (voterSnapshot.exists()) {
 }
 
     if (electionStatus !== "open") {
-  router.push("/election-closed");
+ router.push("/election-closed?type=student");
   return;
 }
     const totalRequiredSelections = positions.reduce(
