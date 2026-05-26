@@ -221,7 +221,12 @@ const calculateRedistributedResults = (votesData) => {
         });
 
         setFirstPreferenceCounts(counts);
-const redistributed = calculateRedistributedResults(votesData);
+const combinedVotesData = {
+  ...votesData,
+  ...(facultySnapshot.exists() ? facultySnapshot.val() : {}),
+};
+
+const redistributed = calculateRedistributedResults(combinedVotesData);
 setRedistributedResults(redistributed);
 
       }
