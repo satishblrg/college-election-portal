@@ -16,8 +16,10 @@ export default function AdminPage() {
   const [firstPreferenceCounts, setFirstPreferenceCounts] = useState({});
   const [facultyPreferenceCounts, setFacultyPreferenceCounts] = useState({});
   const [electionStatus, setElectionStatus] = useState("not-started");
+  const [redistributedResults, setRedistributedResults] = useState({});
+  const [redistributionRounds, setRedistributionRounds] = useState({});
 
-const exportVotesToExcel = async () => {
+  const exportVotesToExcel = async () => {
   const votesRef = ref(db, "votes");
   const snapshot = await get(votesRef);
 
@@ -64,6 +66,112 @@ const exportVotesToExcel = async () => {
   });
 
   saveAs(fileData, "Election_Votes.xlsx");
+};
+
+const positions = [
+  {
+    title: "President",
+    candidates: [
+      { name: "Arjun" },
+      { name: "Rahul" },
+      { name: "Sneha" },
+      { name: "David" },
+    ],
+  },
+  {
+    title: "Vice President",
+    candidates: [
+      { name: "Kiran" },
+      { name: "Priya" },
+      { name: "Ajay" },
+    ],
+  },
+];
+
+const calculateRedistributedResults = (votesData) => {
+  const finalResults = {};
+  const allRounds = {};
+
+  positions.forEach((position) => {
+    const positionVotes = [];
+
+    Object.values(votesData).forEach((voteRecord) => {
+      const rankings = voteRecord.votes?.[position.title];
+
+      if (rankings) {
+        positionVotes.push(rankings);
+      }
+    });
+
+    let activeCandidates = position.candidates.map(
+      (candidate) => candidate.name
+    );
+
+    let winnerFound = false;
+    const rounds = [];
+
+    while (!winnerFound && activeCandidates.length > 1) {
+      const counts = {};
+
+      activeCandidates.forEach((candidate) => {
+        counts[candidate] = 0;
+      });
+
+      positionVotes.forEach((ballot) => {
+        const sortedPreferences = Object.entries(ballot).sort(
+          (a, b) => Number(a[0]) - Number(b[0])
+        );
+
+        for (const [, candidateName] of sortedPreferences) {
+          if (activeCandidates.includes(candidateName)) {
+            counts[candidateName]++;
+            break;
+          }
+        }
+      });
+
+      rounds.push({
+  round: rounds.length + 1,
+  counts: { ...counts },
+});
+
+      const totalVotes = Object.values(counts).reduce(
+        (sum, count) => sum + count,
+        0
+      );
+
+      const winnerEntry = Object.entries(counts).find(
+        ([, count]) => count > totalVotes / 2
+      );
+
+      if (winnerEntry) {
+        finalResults[position.title] = {
+          winner: winnerEntry[0],
+          votes: winnerEntry[1],
+        };
+
+        winnerFound = true;
+      } else {
+        const lowestCandidate = Object.entries(counts).sort(
+          (a, b) => a[1] - b[1]
+        )[0][0];
+
+        activeCandidates = activeCandidates.filter(
+          (candidate) => candidate !== lowestCandidate
+        );
+      }
+    }
+
+    if (!winnerFound && activeCandidates.length === 1) {
+      finalResults[position.title] = {
+        winner: activeCandidates[0],
+        votes: "Final Round",
+      };
+    }
+    allRounds[position.title] = rounds;
+  });
+  setRedistributionRounds(allRounds);
+  return finalResults;
 };
 
   useEffect(() => {
@@ -113,6 +221,9 @@ const exportVotesToExcel = async () => {
         });
 
         setFirstPreferenceCounts(counts);
+const redistributed = calculateRedistributedResults(votesData);
+setRedistributedResults(redistributed);
+
       }
 
       if (facultySnapshot.exists()) {
@@ -317,6 +428,78 @@ const exportVotesToExcel = async () => {
           })}
         </div>
       </div>
+
+      <div className="mt-16">
+  <h2 className="text-3xl font-bold text-yellow-400 mb-6">
+    Final Redistributed Winners
+  </h2>
+
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+    {Object.entries(redistributedResults).map(([position, result]) => (
+      <div
+        key={position}
+        className="bg-black border border-yellow-500 rounded-3xl p-8 shadow-[0_0_40px_rgba(255,215,0,0.25)]"
+      >
+        <p className="text-gray-400">{position}</p>
+
+        <h3 className="text-3xl font-bold mt-3 text-yellow-400">
+          {result.winner}
+        </h3>
+
+        <p className="text-green-400 mt-2">
+          Final Count: {result.votes}
+        </p>
+      </div>
+    ))}
+  </div>
+</div>
+
+<div className="mt-16">
+  <h2 className="text-3xl font-bold text-pink-400 mb-6">
+    Redistribution Rounds
+  </h2>
+
+  {Object.entries(redistributionRounds).map(([position, rounds]) => (
+    <div
+      key={position}
+      className="mb-10 bg-black border border-pink-500 rounded-3xl p-8"
+    >
+      <h3 className="text-2xl font-bold text-yellow-400 mb-6">
+        {position}
+      </h3>
+
+      <div className="space-y-6">
+        {rounds.map((roundData) => (
+          <div
+            key={roundData.round}
+            className="bg-white/5 rounded-2xl p-6"
+          >
+            <h4 className="text-xl font-bold text-pink-300 mb-4">
+              Round {roundData.round}
+            </h4>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {Object.entries(roundData.counts).map(
+                ([candidate, votes]) => (
+                  <div
+                    key={candidate}
+                    className="bg-black rounded-xl p-4 border border-white/10"
+                  >
+                    <p className="text-gray-400">{candidate}</p>
+
+                    <p className="text-2xl font-bold text-green-400">
+                      {votes}
+                    </p>
+                  </div>
+                )
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  ))}
+</div>
 
       {/* LIVE RESULT TABLE */}
       <div className="mt-16">
