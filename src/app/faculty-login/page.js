@@ -14,15 +14,15 @@ export default function FacultyLoginPage() {
 
  const handleFacultyLogin = async () => {
     if (!employeeId) {
-      alert("Please enter your Employee ID.");
-      return;
-    }
+  router.push("/invalid-login");
+  return;
+}
 
     if (staffType === "teaching") {
-      if (!email) {
-        alert("Please enter your official email ID.");
-        return;
-      }
+     if (!email) {
+  router.push("/invalid-login");
+  return;
+}
 
       const allowedDomains = [
   "@iadc.ac.in",

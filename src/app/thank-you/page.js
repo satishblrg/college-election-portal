@@ -1,15 +1,19 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export default function ThankYouPage() {
     const router = useRouter();
-    const searchParams = useSearchParams();
-    const type = searchParams.get("type");
     const exitPortal = () => {
   localStorage.removeItem("studentData");
   localStorage.removeItem("facultyData");
-  router.push(type === "faculty" ? "/faculty-login" : "/login");
+  const facultyData = localStorage.getItem("facultyData");
+
+if (facultyData) {
+  router.push("/faculty-login");
+} else {
+  router.push("/login");
+}
 };
 
   return (
