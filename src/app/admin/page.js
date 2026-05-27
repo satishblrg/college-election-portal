@@ -276,6 +276,8 @@ setRedistributedResults(redistributed);
     };
 
     fetchVotes();
+    const autoRefresh = setInterval(fetchVotes, 30000);
+    return () => clearInterval(autoRefresh);
   }, []);
 
   const totalVotesCast = votesCast + facultyVotesCast;
