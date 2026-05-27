@@ -26,12 +26,12 @@ export default function FacultyVotePage() {
       const electionStatus = settingsSnapshot.val();
 
       if (electionStatus === "not-started") {
-        router.push("/not-started");
+        router.push("/not-started?type=faculty");
         return;
       }
 
       if (electionStatus === "closed") {
-        router.push("/election-closed");
+        router.push("/election-closed?type=faculty");
         return;
       }
     }

@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { ref, get } from "firebase/database";
+import { db } from "@/firebase/config";
 
 export default function FacultyLoginPage() {
   const [staffType, setStaffType] = useState("teaching");
@@ -10,7 +12,7 @@ export default function FacultyLoginPage() {
 
   const router = useRouter();
 
-  const handleFacultyLogin = () => {
+ const handleFacultyLogin = async () => {
     if (!employeeId) {
       alert("Please enter your Employee ID.");
       return;
@@ -33,10 +35,29 @@ const emailValid = allowedDomains.some((domain) =>
 );
 
 if (!emailValid) {
-  alert("Please use your official Indian Academy email ID.");
+  router.push("/invalid-login");
   return;
 }
     }
+
+    const facultyRef = ref(db, "facultyVoters/" + employeeId.trim());
+const facultySnapshot = await get(facultyRef);
+
+if (!facultySnapshot.exists()) {
+  alert("Invalid login credentials.");
+  return;
+}
+
+const facultyRecord = facultySnapshot.val();
+
+if (
+  staffType === "teaching" &&
+  facultyRecord.email &&
+  facultyRecord.email.toLowerCase() !== email.toLowerCase()
+) {
+  alert("Invalid login credentials.");
+  return;
+}
 
     localStorage.setItem(
       "facultyData",

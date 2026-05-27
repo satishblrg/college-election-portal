@@ -1,9 +1,16 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function NotStartedPage() {
   const router = useRouter();
+  const [type, setType] = useState("student");
+
+useEffect(() => {
+  const params = new URLSearchParams(window.location.search);
+  setType(params.get("type") || "student");
+}, []);
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center px-6">
@@ -28,7 +35,7 @@ export default function NotStartedPage() {
 
         <div className="mt-10">
           <button
-            onClick={() => router.push("/login")}
+            onClick={() => router.push(type === "faculty" ? "/faculty-login" : "/login")}
             className="bg-gradient-to-r from-yellow-500 to-purple-600 px-10 py-4 rounded-2xl text-xl font-bold text-white hover:scale-105 transition"
           >
             Back to Login
