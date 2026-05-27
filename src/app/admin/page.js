@@ -280,7 +280,10 @@ setRedistributedResults(redistributed);
 
   const totalVotesCast = votesCast + facultyVotesCast;
 const remaining = totalVoters - totalVotesCast;
-  const pollingPercentage = ((votesCast / totalVoters) * 100).toFixed(1);
+  const pollingPercentage =
+  totalVoters > 0
+    ? ((totalVotesCast / totalVoters) * 100).toFixed(1)
+    : 0;
 
   const markNotStarted = async () => {
     await set(ref(db, "settings/electionStatus"), "not-started");
