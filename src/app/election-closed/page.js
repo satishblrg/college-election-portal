@@ -1,11 +1,16 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function ElectionClosedPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const type = searchParams.get("type");
+  const [type, setType] = useState("student");
+
+useEffect(() => {
+  const params = new URLSearchParams(window.location.search);
+  setType(params.get("type") || "student");
+}, []);
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center px-6">
