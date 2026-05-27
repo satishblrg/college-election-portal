@@ -8,6 +8,7 @@ export default function LiveDisplayPage() {
   const [currentTime, setCurrentTime] = useState("");
   const [votesCast, setVotesCast] = useState(0);
   const [facultyVotesCast, setFacultyVotesCast] = useState(0);
+  const [totalVoters, setTotalVoters] = useState(0);
   const [electionStatus, setElectionStatus] = useState("not-started");
   const [activeCandidateIndex, setActiveCandidateIndex] = useState(0);
   const [isFading, setIsFading] = useState(false);
@@ -15,9 +16,6 @@ export default function LiveDisplayPage() {
   const [winners, setWinners] = useState({});
   const [activeWinnerIndex, setActiveWinnerIndex] = useState(0);
   const [countdown, setCountdown] = useState(3);
-
-
-  const totalVoters = 1000;
 
   const candidates = [
     {
@@ -122,10 +120,24 @@ const activeWinnerImage =
       const votesRef = ref(db, "votes");
       const facultyVotesRef = ref(db, "facultyVotes");
       const statusRef = ref(db, "settings/electionStatus");
+      const votersRef = ref(db, "voters");
+      const facultyVotersRef = ref(db, "facultyVoters");
 
       const votesSnapshot = await get(votesRef);
       const facultySnapshot = await get(facultyVotesRef);
       const statusSnapshot = await get(statusRef);
+      const votersSnapshot = await get(votersRef);
+const facultyVotersSnapshot = await get(facultyVotersRef);
+
+const studentVoterCount = votersSnapshot.exists()
+  ? Object.keys(votersSnapshot.val()).length
+  : 0;
+
+const facultyVoterCount = facultyVotersSnapshot.exists()
+  ? Object.keys(facultyVotersSnapshot.val()).length
+  : 0;
+
+setTotalVoters(studentVoterCount + facultyVoterCount);
 
       if (votesSnapshot.exists()) {
         const votesData = votesSnapshot.val();

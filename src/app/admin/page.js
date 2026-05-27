@@ -13,6 +13,7 @@ export default function AdminPage() {
 
   const [votesCast, setVotesCast] = useState(0);
   const [facultyVotesCast, setFacultyVotesCast] = useState(0);
+  const [totalVoters, setTotalVoters] = useState(0);
   const [firstPreferenceCounts, setFirstPreferenceCounts] = useState({});
   const [facultyPreferenceCounts, setFacultyPreferenceCounts] = useState({});
   const [electionStatus, setElectionStatus] = useState("not-started");
@@ -195,6 +196,21 @@ const calculateRedistributedResults = (votesData) => {
 
       const facultyVotesRef = ref(db, "facultyVotes");
       const facultySnapshot = await get(facultyVotesRef);
+      const votersRef = ref(db, "voters");
+const votersSnapshot = await get(votersRef);
+
+const facultyVotersRef = ref(db, "facultyVoters");
+const facultyVotersSnapshot = await get(facultyVotersRef);
+
+const studentVoterCount = votersSnapshot.exists()
+  ? Object.keys(votersSnapshot.val()).length
+  : 0;
+
+const facultyVoterCount = facultyVotersSnapshot.exists()
+  ? Object.keys(facultyVotersSnapshot.val()).length
+  : 0;
+
+setTotalVoters(studentVoterCount + facultyVoterCount);
 
       if (snapshot.exists()) {
         const votesData = snapshot.val();
@@ -262,8 +278,8 @@ setRedistributedResults(redistributed);
     fetchVotes();
   }, []);
 
-  const totalVoters = 1000;
-  const remaining = totalVoters - votesCast;
+  const totalVotesCast = votesCast + facultyVotesCast;
+const remaining = totalVoters - totalVotesCast;
   const pollingPercentage = ((votesCast / totalVoters) * 100).toFixed(1);
 
   const markNotStarted = async () => {
