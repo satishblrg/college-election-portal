@@ -103,6 +103,14 @@ export default function FacultyVotePage() {
       return;
     }
 
+    const statusRef = ref(db, "settings/electionStatus");
+const statusSnapshot = await get(statusRef);
+
+if (!statusSnapshot.exists() || statusSnapshot.val() !== "open") {
+  router.push("/election-closed?type=faculty");
+  return;
+}
+
     const totalRequiredSelections = positions.reduce(
       (total, position) => total + position.candidates.length,
       0
