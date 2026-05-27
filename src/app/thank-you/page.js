@@ -1,14 +1,16 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function ThankYouPage() {
-  const router = useRouter();
-
-  const exitPortal = () => {
-    localStorage.removeItem("studentData");
-    router.push("/login");
-  };
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const type = searchParams.get("type");
+    const exitPortal = () => {
+  localStorage.removeItem("studentData");
+  localStorage.removeItem("facultyData");
+  router.push(type === "faculty" ? "/faculty-login" : "/login");
+};
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center px-6">

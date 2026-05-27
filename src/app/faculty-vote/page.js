@@ -151,7 +151,7 @@ if (!statusSnapshot.exists() || statusSnapshot.val() !== "open") {
 
     await set(voteRef, voteData);
 
-    router.push("/thank-you");
+    router.push("/thank-you?type=faculty");
   };
 
   return (
