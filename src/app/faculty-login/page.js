@@ -44,7 +44,7 @@ if (!emailValid) {
 const facultySnapshot = await get(facultyRef);
 
 if (!facultySnapshot.exists()) {
-  alert("Invalid login credentials.");
+  router.push("/invalid-login");
   return;
 }
 
@@ -55,7 +55,7 @@ if (
   facultyRecord.email &&
   facultyRecord.email.toLowerCase() !== email.toLowerCase()
 ) {
-  alert("Invalid login credentials.");
+  router.push("/invalid-login");
   return;
 }
 
