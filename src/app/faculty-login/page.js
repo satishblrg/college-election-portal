@@ -49,6 +49,10 @@ if (!facultySnapshot.exists()) {
 }
 
 const facultyRecord = facultySnapshot.val();
+if (facultyRecord.staffType && facultyRecord.staffType !== staffType) {
+  router.push("/invalid-login");
+  return;
+}
 
 if (
   staffType === "teaching" &&
