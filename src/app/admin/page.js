@@ -574,5 +574,8 @@ const remaining = totalVoters - totalVotesCast;
               )}
             </tbody>
           </table>
-        </div>
+                </div>
       </div>
+    </div>
+  );
+}
