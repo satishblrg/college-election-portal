@@ -546,33 +546,33 @@ const remaining = totalVoters - totalVotesCast;
             </thead>
 
             <tbody>
-              {Object.entries(firstPreferenceCounts).flatMap(
-                ([position, studentCandidates]) =>
-                  Object.entries(studentCandidates).map(
-                    ([candidate, studentVotes]) => {
-                      const facultyVotes =
-                        facultyPreferenceCounts[position]?.[candidate] || 0;
+  {positions.flatMap((position) =>
+    position.candidates.map((candidate) => {
+      const studentVotes =
+        firstPreferenceCounts[position.title]?.[candidate.name] || 0;
 
-                      const totalVotes = studentVotes + facultyVotes;
+      const facultyVotes =
+        facultyPreferenceCounts[position.title]?.[candidate.name] || 0;
 
-                      return (
-                        <tr
-                          key={`${position}-${candidate}`}
-                          className="border-t border-purple-800"
-                        >
-                          <td className="p-4">{position}</td>
-                          <td className="p-4">{candidate}</td>
-                          <td className="p-4">{studentVotes}</td>
-                          <td className="p-4">{facultyVotes}</td>
-                          <td className="p-4 font-bold text-pink-400">
-                            {totalVotes}
-                          </td>
-                        </tr>
-                      );
-                    }
-                  )
-              )}
-            </tbody>
+      const totalVotes = studentVotes + facultyVotes;
+
+      return (
+        <tr
+          key={`${position.title}-${candidate.name}`}
+          className="border-t border-purple-800"
+        >
+          <td className="p-4">{position.title}</td>
+          <td className="p-4">{candidate.name}</td>
+          <td className="p-4">{studentVotes}</td>
+          <td className="p-4">{facultyVotes}</td>
+          <td className="p-4 font-bold text-pink-400">
+            {totalVotes}
+          </td>
+        </tr>
+      );
+    })
+  )}
+</tbody>
           </table>
                 </div>
       </div>
